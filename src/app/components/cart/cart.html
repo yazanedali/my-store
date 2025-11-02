@@ -8,69 +8,27 @@
 
   <div *ngIf="cartItems.length > 0" class="cart-content">
     <div class="cart-items">
-      <div *ngFor="let item of cartItems" class="cart-item">
-        <div class="item-image">
-          <img [src]="item.product.imageUrl" [alt]="item.product.name">
-        </div>
-        
-        <div class="item-details">
-          <h3>{{ item.product.name }}</h3>
-          <p class="description">{{ item.product.description }}</p>
-          <p class="price">{{ item.product.price | currency }}</p>
-        </div>
-
-        <div class="quantity-controls">
-          <button 
-            (click)="decreaseQuantity(item)" 
-            [disabled]="item.quantity <= 1"
-            class="btn btn-sm">
-            -
-          </button>
-          <span class="quantity">{{ item.quantity }}</span>
-          <button 
-            (click)="increaseQuantity(item)" 
-            class="btn btn-sm">
-            +
-          </button>
-        </div>
-
-        <div class="item-total">
-          <strong>{{ (item.product.price * item.quantity) | currency }}</strong>
-        </div>
-
-        <button 
-          (click)="removeItem(item.product.id)" 
-          class="btn btn-danger btn-sm">
-          Delete
-        </button>
-      </div>
+      <!-- استخدام المكون الجديد -->
+      <app-cart-item 
+        *ngFor="let item of cartItems"
+        [item]="item"
+        (quantityChange)="onQuantityChange($event)"
+        (removeItem)="onRemoveItem($event)">
+      </app-cart-item>
     </div>
 
-    <div class="cart-summary">
-      <div class="summary-card">
-        <h3>Order Summary</h3>
-        <div class="summary-row">
-          <span>Subtotal:</span>
-          <span>{{ totalPrice | currency }}</span>
-        </div>
-        <div class="summary-row">
-          <span>Tax (10%):</span>
-          <span>{{ totalPrice * 0.1 | currency }}</span>
-        </div>
-        <div class="summary-row total">
-          <strong>Total:</strong>
-          <strong>{{ totalPrice * 1.1 | currency }}</strong>
-        </div>
-        
-        <div class="cart-actions">
-          <button (click)="clearCart()" class="btn btn-secondary">
-            Clear Cart
-          </button>
-          <button (click)="checkout()" class="btn btn-primary">
-            Checkout
-          </button>
-        </div>
-      </div>
-    </div>
+    <!-- استخدام المكون الجديد -->
+    <app-order-summary
+      [items]="cartItems"
+      [subtotal]="totalPrice"
+      [tax]="tax"
+      [total]="grandTotal"
+      [submitButtonText]="'Proceed to Checkout'"
+      (submitOrder)="checkout()">
+      
+      <button (click)="clearCart()" class="btn btn-secondary">
+        Clear Cart
+      </button>
+    </app-order-summary>
   </div>
 </div>

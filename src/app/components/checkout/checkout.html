@@ -18,6 +18,7 @@
             type="text" 
             id="fullName" 
             [(ngModel)]="customerInfo.fullName" 
+            (ngModelChange)="validateFullName()"
             name="fullName"
             class="form-control"
             [class.error]="formErrors.fullName">
@@ -30,6 +31,7 @@
             type="email" 
             id="email" 
             [(ngModel)]="customerInfo.email" 
+            (ngModelChange)="validateEmail()"
             name="email"
             class="form-control"
             [class.error]="formErrors.email">
@@ -42,6 +44,7 @@
             type="text" 
             id="address" 
             [(ngModel)]="customerInfo.address" 
+            (ngModelChange)="validateAddress()"
             name="address"
             class="form-control"
             [class.error]="formErrors.address">
@@ -55,6 +58,7 @@
               type="text" 
               id="city" 
               [(ngModel)]="customerInfo.city" 
+              (ngModelChange)="validateCity()"
               name="city"
               class="form-control"
               [class.error]="formErrors.city">
@@ -67,6 +71,7 @@
               type="text" 
               id="state" 
               [(ngModel)]="customerInfo.state" 
+              (ngModelChange)="validateState()"
               name="state"
               class="form-control"
               [class.error]="formErrors.state">
@@ -81,6 +86,7 @@
               type="text" 
               id="zipCode" 
               [(ngModel)]="customerInfo.zipCode" 
+              (ngModelChange)="validateZipCode()"
               name="zipCode"
               class="form-control"
               [class.error]="formErrors.zipCode">
@@ -93,6 +99,7 @@
               type="text" 
               id="country" 
               [(ngModel)]="customerInfo.country" 
+              (ngModelChange)="validateCountry()"
               name="country"
               class="form-control"
               [class.error]="formErrors.country">
@@ -111,7 +118,8 @@
               type="radio" 
               name="paymentMethod" 
               value="credit" 
-              [(ngModel)]="customerInfo.paymentMethod">
+              [(ngModel)]="customerInfo.paymentMethod"
+              (ngModelChange)="validatePaymentMethod()">
             Credit Card
           </label>
           
@@ -120,7 +128,8 @@
               type="radio" 
               name="paymentMethod" 
               value="paypal" 
-              [(ngModel)]="customerInfo.paymentMethod">
+              [(ngModel)]="customerInfo.paymentMethod"
+              (ngModelChange)="validatePaymentMethod()">
             PayPal
           </label>
         </div>
@@ -133,6 +142,7 @@
               type="text" 
               id="cardNumber" 
               [(ngModel)]="customerInfo.cardNumber" 
+              (ngModelChange)="validateCardNumber()"
               name="cardNumber"
               placeholder="1234 5678 9012 3456"
               class="form-control"
@@ -147,6 +157,7 @@
                 type="text" 
                 id="expiryDate" 
                 [(ngModel)]="customerInfo.expiryDate" 
+                (ngModelChange)="validateExpiryDate()"
                 name="expiryDate"
                 placeholder="MM/YY"
                 class="form-control"
@@ -160,6 +171,7 @@
                 type="text" 
                 id="cvv" 
                 [(ngModel)]="customerInfo.cvv" 
+                (ngModelChange)="validateCVV()"
                 name="cvv"
                 placeholder="123"
                 class="form-control"
@@ -172,51 +184,16 @@
     </div>
 
     <!-- Order Summary -->
-    <div class="order-summary">
-      <h2>Order Summary</h2>
+    <app-order-summary
+      [items]="cartItems"
+      [subtotal]="totalPrice"
+      [tax]="tax"
+      [total]="grandTotal"
+      [submitButtonText]="'Place Order'"
+      [canSubmit]="canSubmitOrder"
+      (submitOrder)="submitOrder()">
       
-      <div class="order-items">
-        <div *ngFor="let item of cartItems" class="order-item">
-          <img [src]="item.product.imageUrl" [alt]="item.product.name" class="item-image">
-          <div class="item-details">
-            <h4>{{ item.product.name }}</h4>
-            <p class="item-price">{{ item.product.price | currency }} × {{ item.quantity }}</p>
-          </div>
-          <div class="item-total">
-            {{ (item.product.price * item.quantity) | currency }}
-          </div>
-          <button 
-            (click)="removeItem(item.product.id)" 
-            class="remove-btn">
-            ×
-          </button>
-        </div>
-      </div>
-
-      <div class="summary-totals">
-        <div class="summary-row">
-          <span>Subtotal:</span>
-          <span>{{ subtotal | currency }}</span>
-        </div>
-        <div class="summary-row">
-          <span>Tax (10%):</span>
-          <span>{{ tax | currency }}</span>
-        </div>
-        <div class="summary-row total">
-          <strong>Total:</strong>
-          <strong>{{ total | currency }}</strong>
-        </div>
-      </div>
-
-      <button 
-        (click)="submitOrder()" 
-        [disabled]="isSubmitting"
-        class="btn btn-primary submit-order-btn">
-        <span *ngIf="!isSubmitting">Place Order</span>
-        <span *ngIf="isSubmitting">Processing...</span>
-      </button>
-
       <a routerLink="/cart" class="back-to-cart">← Back to Cart</a>
-    </div>
+    </app-order-summary>
   </div>
 </div>

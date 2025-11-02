@@ -1,15 +1,16 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { RouterModule } from '@angular/router';
-import { FormsModule } from '@angular/forms'; // أضفنا هذا
+import { FormsModule } from '@angular/forms';
 import { ProductService } from '../../services/product';
 import { CartService } from '../../services/cart';
+import { ProductCardComponent } from '../product-card/product-card';
 import { Product } from '../../models/product';
 
 @Component({
   selector: 'app-product-list',
   standalone: true,
-  imports: [CommonModule, RouterModule, CurrencyPipe, FormsModule], // أضفنا FormsModule هنا
+  imports: [CommonModule, RouterModule, FormsModule, ProductCardComponent],
   templateUrl: './product-list.html',
   styleUrls: ['./product-list.css']
 })
@@ -20,17 +21,15 @@ export class ProductListComponent implements OnInit {
   loading: boolean = true;
   error: string = '';
 
-  // جعلنا cartService public حتى نستطيع استخدامه في الـtemplate
   constructor(
     private productService: ProductService,
-    public cartService: CartService // غيرنا private إلى public
-  ) { }
+    public cartService: CartService
+  ) {}
 
   ngOnInit(): void {
     this.loadProducts();
   }
 
-  // Load products from service
   loadProducts(): void {
     this.loading = true;
     this.productService.getProducts().subscribe({
@@ -47,7 +46,6 @@ export class ProductListComponent implements OnInit {
     });
   }
 
-  // Search products
   searchProducts(): void {
     if (!this.searchTerm.trim()) {
       this.filteredProducts = this.products;
@@ -61,30 +59,25 @@ export class ProductListComponent implements OnInit {
     );
   }
 
-  // Clear search
   clearSearch(): void {
     this.searchTerm = '';
     this.filteredProducts = this.products;
   }
 
-  // Add product to cart
-  addToCart(product: Product): void {
+  onAddToCart(product: Product): void {
     this.cartService.addToCart(product, 1);
     alert(`${product.name} added to cart!`);
   }
 
-  // Check if product is in cart
-  isInCart(productId: number): boolean {
+  onImageError(event: {event: any, productId: number}): void {
+    event.event.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
+  }
+
+  isProductInCart(productId: number): boolean {
     return this.cartService.isInCart(productId);
   }
 
-  // Get quantity in cart
-  getQuantityInCart(productId: number): number {
+  getProductQuantity(productId: number): number {
     return this.cartService.getProductQuantity(productId);
-  }
-
-  // Handle image error - أضفنا هذه الدالة
-  handleImageError(event: any): void {
-    event.target.src = 'https://via.placeholder.com/300x200?text=No+Image';
   }
 }

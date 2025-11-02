@@ -135,3 +135,12 @@ json
 3. Connect to real API backend
 
 4. Add payment integration
+
+## 🙏 Acknowledgments
+1. Angular Team for the amazing framework
+
+2. Udacity for project guidelines
+
+3. Open source community for inspiration
+
+

@@ -1,25 +1,25 @@
 import { Component, OnInit } from '@angular/core';
-import { CommonModule, CurrencyPipe } from '@angular/common';
+import { CommonModule } from '@angular/common';
 import { Router, RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
 import { CartService } from '../../services/cart';
+import { OrderSummaryComponent } from '../order-summary/order-summary';
 import { CartItem } from '../../models/cart-item';
-import { Order, CustomerInfo } from '../../models/order';
 
 @Component({
   selector: 'app-checkout',
   standalone: true,
-  imports: [CommonModule, RouterModule, CurrencyPipe, FormsModule, ],
+  imports: [CommonModule, RouterModule, FormsModule, OrderSummaryComponent],
   templateUrl: './checkout.html',
   styleUrls: ['./checkout.css']
 })
 export class CheckoutComponent implements OnInit {
   cartItems: CartItem[] = [];
-  subtotal: number = 0;
+  totalPrice: number = 0;
   tax: number = 0;
-  total: number = 0;
+  grandTotal: number = 0;
   
-  customerInfo: CustomerInfo = {
+  customerInfo = {
     fullName: '',
     email: '',
     address: '',
@@ -27,10 +27,12 @@ export class CheckoutComponent implements OnInit {
     state: '',
     zipCode: '',
     country: '',
-    paymentMethod: 'credit'
+    paymentMethod: 'credit',
+    cardNumber: '',
+    expiryDate: '',
+    cvv: ''
   };
 
-  // Form validation
   formErrors = {
     fullName: '',
     email: '',
@@ -46,35 +48,152 @@ export class CheckoutComponent implements OnInit {
 
   isSubmitting: boolean = false;
 
+  // دالة جديدة للتحقق من إمكانية الإرسال
+  get canSubmitOrder(): boolean {
+    return !!(this.customerInfo.fullName && 
+              this.customerInfo.email && 
+              this.customerInfo.address &&
+              this.customerInfo.city &&
+              this.customerInfo.state &&
+              this.customerInfo.zipCode &&
+              this.customerInfo.country);
+  }
+
   constructor(
     private cartService: CartService,
     private router: Router
-  ) { }
+  ) {}
 
   ngOnInit(): void {
-    this.loadCartItems();
-    this.calculateTotals();
-  }
-
-  loadCartItems(): void {
     this.cartItems = this.cartService.getCartItems();
+    this.totalPrice = this.cartService.getTotalPrice();
+    this.tax = this.totalPrice * 0.1;
+    this.grandTotal = this.totalPrice + this.tax;
+    
     if (this.cartItems.length === 0) {
       this.router.navigate(['/cart']);
     }
   }
 
-  calculateTotals(): void {
-    this.subtotal = this.cartService.getTotalPrice();
-    this.tax = this.subtotal * 0.1; // 10% tax
-    this.total = this.subtotal + this.tax;
+  submitOrder(): void {
+    if (this.validateForm()) {
+      this.isSubmitting = true;
+      
+      const order = {
+        customerInfo: this.customerInfo,
+        cartItems: this.cartItems,
+        total: this.grandTotal,
+        orderDate: new Date()
+      };
+      
+      localStorage.setItem('currentOrder', JSON.stringify(order));
+      this.cartService.clearCart();
+      
+      setTimeout(() => {
+        this.isSubmitting = false;
+        this.router.navigate(['/confirmation']);
+      }, 2000);
+    }
+  }
+    validatePaymentMethod(): void {
+    console.log('Payment method changed to:', this.customerInfo.paymentMethod);
   }
 
-  // Validate form
+    validateCardNumber(): void {
+    if (!this.customerInfo.cardNumber) {
+      this.formErrors.cardNumber = 'Card number is required';
+    } else if (!/^\d{16}$/.test(this.customerInfo.cardNumber.replace(/\s/g, ''))) {
+      this.formErrors.cardNumber = 'Please enter a valid 16-digit card number';
+    } else {
+      this.formErrors.cardNumber = '';
+    }
+  }
+    validateFullName(): void {
+    if (!this.customerInfo.fullName.trim()) {
+      this.formErrors.fullName = 'Full name is required';
+    } else if (this.customerInfo.fullName.length < 2) {
+      this.formErrors.fullName = 'Full name must be at least 2 characters';
+    } else {
+      this.formErrors.fullName = '';
+    }
+  }
+
+  validateEmail(): void {
+    if (!this.customerInfo.email.trim()) {
+      this.formErrors.email = 'Email is required';
+    } else if (!this.isValidEmail(this.customerInfo.email)) {
+      this.formErrors.email = 'Please enter a valid email address';
+    } else {
+      this.formErrors.email = '';
+    }
+  }
+
+  validateAddress(): void {
+    if (!this.customerInfo.address.trim()) {
+      this.formErrors.address = 'Address is required';
+    } else {
+      this.formErrors.address = '';
+    }
+  }
+
+  validateCity(): void {
+    if (!this.customerInfo.city.trim()) {
+      this.formErrors.city = 'City is required';
+    } else {
+      this.formErrors.city = '';
+    }
+  }
+
+  validateState(): void {
+    if (!this.customerInfo.state.trim()) {
+      this.formErrors.state = 'State is required';
+    } else {
+      this.formErrors.state = '';
+    }
+  }
+
+  validateZipCode(): void {
+    if (!this.customerInfo.zipCode.trim()) {
+      this.formErrors.zipCode = 'ZIP code is required';
+    } else if (!/^\d{5}(-\d{4})?$/.test(this.customerInfo.zipCode)) {
+      this.formErrors.zipCode = 'Please enter a valid ZIP code';
+    } else {
+      this.formErrors.zipCode = '';
+    }
+  }
+
+    validateCountry(): void {
+    if (!this.customerInfo.country.trim()) {
+      this.formErrors.country = 'Country is required';
+    } else {
+      this.formErrors.country = '';
+    }
+  }
+
+    validateExpiryDate(): void {
+    if (!this.customerInfo.expiryDate) {
+      this.formErrors.expiryDate = 'Expiry date is required';
+    } else if (!/^\d{2}\/\d{2}$/.test(this.customerInfo.expiryDate)) {
+      this.formErrors.expiryDate = 'Please enter a valid expiry date (MM/YY)';
+    } else {
+      this.formErrors.expiryDate = '';
+    }
+  }
+
+    validateCVV(): void {
+    if (!this.customerInfo.cvv) {
+      this.formErrors.cvv = 'CVV is required';
+    } else if (!/^\d{3,4}$/.test(this.customerInfo.cvv)) {
+      this.formErrors.cvv = 'Please enter a valid CVV (3-4 digits)';
+    } else {
+      this.formErrors.cvv = '';
+    }
+  }
+
   validateForm(): boolean {
     let isValid = true;
     this.clearErrors();
 
-    // Required fields validation
     if (!this.customerInfo.fullName.trim()) {
       this.formErrors.fullName = 'Full name is required';
       isValid = false;
@@ -88,6 +207,7 @@ export class CheckoutComponent implements OnInit {
       isValid = false;
     }
 
+    // تحقق من باقي الحقول بنفس الطريقة
     if (!this.customerInfo.address.trim()) {
       this.formErrors.address = 'Address is required';
       isValid = false;
@@ -112,89 +232,9 @@ export class CheckoutComponent implements OnInit {
       this.formErrors.country = 'Country is required';
       isValid = false;
     }
-
-    // Payment validation
-    if (this.customerInfo.paymentMethod === 'credit') {
-      if (!this.customerInfo.cardNumber) {
-        this.formErrors.cardNumber = 'Card number is required';
-        isValid = false;
-      } else if (!this.isValidCardNumber(this.customerInfo.cardNumber)) {
-        this.formErrors.cardNumber = 'Please enter a valid card number';
-        isValid = false;
-      }
-
-      if (!this.customerInfo.expiryDate) {
-        this.formErrors.expiryDate = 'Expiry date is required';
-        isValid = false;
-      }
-
-      if (!this.customerInfo.cvv) {
-        this.formErrors.cvv = 'CVV is required';
-        isValid = false;
-      } else if (!this.isValidCVV(this.customerInfo.cvv)) {
-        this.formErrors.cvv = 'Please enter a valid CVV';
-        isValid = false;
-      }
-    }
+     isValid = !Object.values(this.formErrors).some(error => error !== '');
 
     return isValid;
-  }
-
-  // Submit order
-  submitOrder(): void {
-    if (!this.validateForm()) {
-      return;
-    }
-
-    this.isSubmitting = true;
-
-    // Simulate API call
-    setTimeout(() => {
-      const order: Order = {
-        customerInfo: this.customerInfo,
-        cartItems: this.cartItems,
-        total: this.total,
-        orderDate: new Date(),
-        status: 'completed'
-      };
-
-      // Save order to localStorage (simulate database)
-      this.saveOrder(order);
-      
-      // Clear cart
-      this.cartService.clearCart();
-      
-      // Navigate to confirmation
-      this.router.navigate(['/confirmation'], { 
-        state: { order: order }
-      });
-      
-      this.isSubmitting = false;
-    }, 2000);
-  }
-
-  // Save order to localStorage
-  private saveOrder(order: Order): void {
-    const orders = JSON.parse(localStorage.getItem('orders') || '[]');
-    order.id = orders.length + 1;
-    orders.push(order);
-    localStorage.setItem('orders', JSON.stringify(orders));
-  }
-
-  // Validation helpers
-  private isValidEmail(email: string): boolean {
-    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email);
-  }
-
-  private isValidCardNumber(cardNumber: string): boolean {
-    const cardRegex = /^\d{16}$/;
-    return cardRegex.test(cardNumber.replace(/\s/g, ''));
-  }
-
-  private isValidCVV(cvv: string): boolean {
-    const cvvRegex = /^\d{3,4}$/;
-    return cvvRegex.test(cvv);
   }
 
   private clearErrors(): void {
@@ -212,17 +252,8 @@ export class CheckoutComponent implements OnInit {
     };
   }
 
-  // Update quantity
-  updateQuantity(productId: number, quantity: number): void {
-    this.cartService.updateQuantity(productId, quantity);
-    this.loadCartItems();
-    this.calculateTotals();
-  }
-
-  // Remove item
-  removeItem(productId: number): void {
-    this.cartService.removeFromCart(productId);
-    this.loadCartItems();
-    this.calculateTotals();
+  private isValidEmail(email: string): boolean {
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+    return emailRegex.test(email);
   }
 }

@@ -26,13 +26,18 @@ export class ConfirmationComponent implements OnInit {
   }
 
   ngOnInit(): void {
-    if (!this.order) {
-      // If no order data, try to get from localStorage
-      this.loadLastOrder();
-    }
-
-    if (this.order) {
+    // جلب بيانات الطلب من localStorage
+    const savedOrder = localStorage.getItem('currentOrder');
+    
+    if (savedOrder) {
+      this.order = JSON.parse(savedOrder);
       this.generateOrderNumber();
+      
+      // مسح الطلب من localStorage بعد العرض
+      localStorage.removeItem('currentOrder');
+    } else {
+      // إذا لم يكن هناك طلب، ارجع للصفحة الرئيسية
+      this.router.navigate(['/products']);
     }
   }
 
@@ -44,11 +49,9 @@ export class ConfirmationComponent implements OnInit {
   }
 
   generateOrderNumber(): void {
-    if (this.order) {
-      const timestamp = new Date().getTime();
-      const random = Math.floor(Math.random() * 1000);
-      this.orderNumber = `ORD-${timestamp}-${random}`;
-    }
+    const timestamp = new Date().getTime();
+    const random = Math.floor(Math.random() * 1000);
+    this.orderNumber = `ORD-${timestamp}-${random}`;
   }
 
   getMaskedCardNumber(): string {
