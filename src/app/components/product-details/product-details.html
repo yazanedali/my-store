@@ -1,0 +1,90 @@
+<div class="product-details-container">
+  <!-- Back Button -->
+  <button (click)="goBack()" class="back-btn">
+    ← Back to Products
+  </button>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <p>Loading product details...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error">
+    <p>{{ error }}</p>
+    <button (click)="goBack()" class="btn btn-primary">Back to Products</button>
+  </div>
+
+  <!-- Product Details -->
+  <div *ngIf="product && !loading" class="product-details">
+    <div class="product-images">
+      <div class="main-image">
+        <img 
+          [src]="product.imageUrl" 
+          [alt]="product.name" 
+          (error)="handleImageError($event)"
+          class="product-img">
+      </div>
+    </div>
+
+    <div class="product-info">
+      <h1 class="product-title">{{ product.name }}</h1>
+      <p class="product-price">{{ product.price | currency }}</p>
+      
+      <div class="product-description">
+        <h3>Description</h3>
+        <p>{{ product.description }}</p>
+      </div>
+
+      <!-- Cart Status -->
+      <div *ngIf="isInCart()" class="cart-status">
+        <p>🛒 Already in cart: {{ getQuantityInCart() }} item(s)</p>
+      </div>
+
+      <!-- Quantity Selector -->
+      <div class="quantity-selector">
+        <label for="quantity">Quantity:</label>
+        <div class="quantity-controls">
+          <button 
+            (click)="decreaseQuantity()" 
+            [disabled]="selectedQuantity <= 1"
+            class="quantity-btn">
+            -
+          </button>
+          <span class="quantity-display">{{ selectedQuantity }}</span>
+          <button 
+            (click)="increaseQuantity()" 
+            class="quantity-btn">
+            +
+          </button>
+        </div>
+      </div>
+
+      <!-- Action Buttons -->
+      <div class="action-buttons">
+        <button 
+          (click)="addToCart()" 
+          class="btn btn-primary add-to-cart-btn">
+          Add to Cart
+        </button>
+        
+        <button 
+          (click)="addToCart(); goBack()" 
+          class="btn btn-secondary buy-now-btn">
+          Buy Now & Continue Shopping
+        </button>
+      </div>
+
+      <!-- Product Features -->
+      <div class="product-features">
+        <h3>Product Features</h3>
+        <ul>
+          <li>Free shipping on orders over $50</li>
+          <li>30-day money-back guarantee</li>
+          <li>24/7 customer support</li>
+          <li>Secure payment processing</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,222 @@
+<div class="checkout-container">
+  <h1>Checkout</h1>
+
+  <div *ngIf="cartItems.length === 0" class="empty-cart">
+    <p>Your cart is empty</p>
+    <a routerLink="/products" class="btn btn-primary">Continue Shopping</a>
+  </div>
+
+  <div *ngIf="cartItems.length > 0" class="checkout-content">
+    <div class="checkout-form">
+      <!-- Customer Information -->
+      <section class="form-section">
+        <h2>Customer Information</h2>
+        
+        <div class="form-group">
+          <label for="fullName">Full Name *</label>
+          <input 
+            type="text" 
+            id="fullName" 
+            [(ngModel)]="customerInfo.fullName" 
+            name="fullName"
+            class="form-control"
+            [class.error]="formErrors.fullName">
+          <div class="error-message" *ngIf="formErrors.fullName">{{ formErrors.fullName }}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="email">Email *</label>
+          <input 
+            type="email" 
+            id="email" 
+            [(ngModel)]="customerInfo.email" 
+            name="email"
+            class="form-control"
+            [class.error]="formErrors.email">
+          <div class="error-message" *ngIf="formErrors.email">{{ formErrors.email }}</div>
+        </div>
+
+        <div class="form-group">
+          <label for="address">Address *</label>
+          <input 
+            type="text" 
+            id="address" 
+            [(ngModel)]="customerInfo.address" 
+            name="address"
+            class="form-control"
+            [class.error]="formErrors.address">
+          <div class="error-message" *ngIf="formErrors.address">{{ formErrors.address }}</div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="city">City *</label>
+            <input 
+              type="text" 
+              id="city" 
+              [(ngModel)]="customerInfo.city" 
+              name="city"
+              class="form-control"
+              [class.error]="formErrors.city">
+            <div class="error-message" *ngIf="formErrors.city">{{ formErrors.city }}</div>
+          </div>
+
+          <div class="form-group">
+            <label for="state">State *</label>
+            <input 
+              type="text" 
+              id="state" 
+              [(ngModel)]="customerInfo.state" 
+              name="state"
+              class="form-control"
+              [class.error]="formErrors.state">
+            <div class="error-message" *ngIf="formErrors.state">{{ formErrors.state }}</div>
+          </div>
+        </div>
+
+        <div class="form-row">
+          <div class="form-group">
+            <label for="zipCode">ZIP Code *</label>
+            <input 
+              type="text" 
+              id="zipCode" 
+              [(ngModel)]="customerInfo.zipCode" 
+              name="zipCode"
+              class="form-control"
+              [class.error]="formErrors.zipCode">
+            <div class="error-message" *ngIf="formErrors.zipCode">{{ formErrors.zipCode }}</div>
+          </div>
+
+          <div class="form-group">
+            <label for="country">Country *</label>
+            <input 
+              type="text" 
+              id="country" 
+              [(ngModel)]="customerInfo.country" 
+              name="country"
+              class="form-control"
+              [class.error]="formErrors.country">
+            <div class="error-message" *ngIf="formErrors.country">{{ formErrors.country }}</div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Payment Method -->
+      <section class="form-section">
+        <h2>Payment Method</h2>
+        
+        <div class="payment-methods">
+          <label class="payment-option">
+            <input 
+              type="radio" 
+              name="paymentMethod" 
+              value="credit" 
+              [(ngModel)]="customerInfo.paymentMethod">
+            Credit Card
+          </label>
+          
+          <label class="payment-option">
+            <input 
+              type="radio" 
+              name="paymentMethod" 
+              value="paypal" 
+              [(ngModel)]="customerInfo.paymentMethod">
+            PayPal
+          </label>
+        </div>
+
+        <!-- Credit Card Details -->
+        <div *ngIf="customerInfo.paymentMethod === 'credit'" class="credit-card-details">
+          <div class="form-group">
+            <label for="cardNumber">Card Number *</label>
+            <input 
+              type="text" 
+              id="cardNumber" 
+              [(ngModel)]="customerInfo.cardNumber" 
+              name="cardNumber"
+              placeholder="1234 5678 9012 3456"
+              class="form-control"
+              [class.error]="formErrors.cardNumber">
+            <div class="error-message" *ngIf="formErrors.cardNumber">{{ formErrors.cardNumber }}</div>
+          </div>
+
+          <div class="form-row">
+            <div class="form-group">
+              <label for="expiryDate">Expiry Date *</label>
+              <input 
+                type="text" 
+                id="expiryDate" 
+                [(ngModel)]="customerInfo.expiryDate" 
+                name="expiryDate"
+                placeholder="MM/YY"
+                class="form-control"
+                [class.error]="formErrors.expiryDate">
+              <div class="error-message" *ngIf="formErrors.expiryDate">{{ formErrors.expiryDate }}</div>
+            </div>
+
+            <div class="form-group">
+              <label for="cvv">CVV *</label>
+              <input 
+                type="text" 
+                id="cvv" 
+                [(ngModel)]="customerInfo.cvv" 
+                name="cvv"
+                placeholder="123"
+                class="form-control"
+                [class.error]="formErrors.cvv">
+              <div class="error-message" *ngIf="formErrors.cvv">{{ formErrors.cvv }}</div>
+            </div>
+          </div>
+        </div>
+      </section>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <h2>Order Summary</h2>
+      
+      <div class="order-items">
+        <div *ngFor="let item of cartItems" class="order-item">
+          <img [src]="item.product.imageUrl" [alt]="item.product.name" class="item-image">
+          <div class="item-details">
+            <h4>{{ item.product.name }}</h4>
+            <p class="item-price">{{ item.product.price | currency }} × {{ item.quantity }}</p>
+          </div>
+          <div class="item-total">
+            {{ (item.product.price * item.quantity) | currency }}
+          </div>
+          <button 
+            (click)="removeItem(item.product.id)" 
+            class="remove-btn">
+            ×
+          </button>
+        </div>
+      </div>
+
+      <div class="summary-totals">
+        <div class="summary-row">
+          <span>Subtotal:</span>
+          <span>{{ subtotal | currency }}</span>
+        </div>
+        <div class="summary-row">
+          <span>Tax (10%):</span>
+          <span>{{ tax | currency }}</span>
+        </div>
+        <div class="summary-row total">
+          <strong>Total:</strong>
+          <strong>{{ total | currency }}</strong>
+        </div>
+      </div>
+
+      <button 
+        (click)="submitOrder()" 
+        [disabled]="isSubmitting"
+        class="btn btn-primary submit-order-btn">
+        <span *ngIf="!isSubmitting">Place Order</span>
+        <span *ngIf="isSubmitting">Processing...</span>
+      </button>
+
+      <a routerLink="/cart" class="back-to-cart">← Back to Cart</a>
+    </div>
+  </div>
+</div>

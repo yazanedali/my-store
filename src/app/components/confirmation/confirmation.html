@@ -1,0 +1,170 @@
+<div class="confirmation-container">
+  <div class="confirmation-content" *ngIf="order; else noOrder">
+    <!-- Success Header -->
+    <div class="success-header">
+      <div class="success-icon">✅</div>
+      <h1>Order Confirmed!</h1>
+      <p class="success-message">Thank you for your purchase. Your order has been successfully placed.</p>
+    </div>
+
+    <!-- Order Summary -->
+    <div class="order-summary">
+      <div class="summary-header">
+        <h2>Order Summary</h2>
+        <button (click)="printOrder()" class="btn btn-secondary print-btn">Print Receipt</button>
+      </div>
+
+      <div class="order-details">
+        <div class="detail-row">
+          <span class="label">Order Number:</span>
+          <span class="value">{{ orderNumber }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Order Date:</span>
+          <span class="value">{{ order.orderDate | date:'fullDate' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Estimated Delivery:</span>
+          <span class="value">{{ estimatedDelivery | date:'fullDate' }}</span>
+        </div>
+        <div class="detail-row">
+          <span class="label">Status:</span>
+          <span class="value status-confirmed">Confirmed</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Customer Information -->
+    <div class="info-section">
+      <h3>Customer Information</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <strong>Full Name:</strong>
+          <span>{{ order.customerInfo.fullName }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Email:</strong>
+          <span>{{ order.customerInfo.email }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Address:</strong>
+          <span>{{ order.customerInfo.address }}</span>
+        </div>
+        <div class="info-item">
+          <strong>City:</strong>
+          <span>{{ order.customerInfo.city }}</span>
+        </div>
+        <div class="info-item">
+          <strong>State:</strong>
+          <span>{{ order.customerInfo.state }}</span>
+        </div>
+        <div class="info-item">
+          <strong>ZIP Code:</strong>
+          <span>{{ order.customerInfo.zipCode }}</span>
+        </div>
+        <div class="info-item">
+          <strong>Country:</strong>
+          <span>{{ order.customerInfo.country }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Payment Information -->
+    <div class="info-section">
+      <h3>Payment Information</h3>
+      <div class="info-grid">
+        <div class="info-item">
+          <strong>Payment Method:</strong>
+          <span>{{ getPaymentMethodText() }}</span>
+        </div>
+        <div class="info-item" *ngIf="order.customerInfo.paymentMethod === 'credit'">
+          <strong>Card Number:</strong>
+          <span>{{ getMaskedCardNumber() }}</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Items -->
+    <div class="order-items-section">
+      <h3>Order Items</h3>
+      <div class="order-items">
+        <div *ngFor="let item of order.cartItems" class="order-item">
+          <img [src]="item.product.imageUrl" [alt]="item.product.name" class="item-image">
+          <div class="item-details">
+            <h4>{{ item.product.name }}</h4>
+            <p class="item-description">{{ item.product.description }}</p>
+            <p class="item-quantity">Quantity: {{ item.quantity }}</p>
+          </div>
+          <div class="item-price">
+            {{ (item.product.price * item.quantity) | currency }}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Order Totals -->
+    <div class="order-totals">
+      <div class="total-row">
+        <span>Subtotal:</span>
+        <span>{{ getSubtotal() | currency }}</span>
+      </div>
+      <div class="total-row">
+        <span>Tax (10%):</span>
+        <span>{{ getTaxAmount() | currency }}</span>
+      </div>
+      <div class="total-row grand-total">
+        <strong>Total:</strong>
+        <strong>{{ getOrderTotal() | currency }}</strong>
+      </div>
+    </div>
+
+    <!-- Next Steps -->
+    <div class="next-steps">
+      <h3>What's Next?</h3>
+      <div class="steps-timeline">
+        <div class="step">
+          <div class="step-icon">📧</div>
+          <div class="step-content">
+            <strong>Order Confirmation Email</strong>
+            <p>We've sent a confirmation email to {{ order.customerInfo.email }}</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">🚚</div>
+          <div class="step-content">
+            <strong>Shipping & Delivery</strong>
+            <p>Your order will be shipped within 24 hours. Estimated delivery: {{ estimatedDelivery | date:'fullDate' }}</p>
+          </div>
+        </div>
+        <div class="step">
+          <div class="step-icon">📞</div>
+          <div class="step-content">
+            <strong>Need Help?</strong>
+            <p>Contact our customer support at support@mystore.com or call 1-800-MY-STORE</p>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Action Buttons -->
+    <div class="action-buttons">
+      <button routerLink="/products" class="btn btn-primary">
+        Continue Shopping
+      </button>
+      <button (click)="printOrder()" class="btn btn-secondary">
+        Print Receipt
+      </button>
+    </div>
+  </div>
+
+  <ng-template #noOrder>
+    <div class="no-order">
+      <div class="no-order-icon">❓</div>
+      <h2>No Order Found</h2>
+      <p>We couldn't find any order information. Please try placing an order again.</p>
+      <button routerLink="/products" class="btn btn-primary">
+        Start Shopping
+      </button>
+    </div>
+  </ng-template>
+</div>

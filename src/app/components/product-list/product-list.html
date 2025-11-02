@@ -1,0 +1,67 @@
+<div class="product-list-container">
+  <!-- Header Section -->
+  <div class="header">
+    <h1>Our Products</h1>
+    <div class="search-section">
+      <div class="search-box">
+        <input type="text" [(ngModel)]="searchTerm" (input)="searchProducts()" placeholder="Search products..."
+          class="search-input">
+        <button *ngIf="searchTerm" (click)="clearSearch()" class="clear-search-btn">
+          Clear
+        </button>
+      </div>
+      <div class="cart-info">
+        <a [routerLink]="['/cart']" class="cart-link">
+          🛒 Cart ({{ cartService.getTotalItems() }})
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- Loading State -->
+  <div *ngIf="loading" class="loading">
+    <p>Loading products...</p>
+  </div>
+
+  <!-- Error State -->
+  <div *ngIf="error && !loading" class="error">
+    <p>{{ error }}</p>
+    <button (click)="loadProducts()" class="btn btn-primary">Try Again</button>
+  </div>
+
+  <!-- Products Grid -->
+  <div *ngIf="!loading && !error" class="products-grid">
+    <!-- No Results -->
+    <div *ngIf="filteredProducts.length === 0" class="no-results">
+      <p>No products found matching your search.</p>
+      <button (click)="clearSearch()" class="btn btn-primary">Show All Products</button>
+    </div>
+
+    <!-- Products -->
+    <div *ngFor="let product of filteredProducts" class="product-card">
+      <div class="product-image">
+        <img [src]="product.imageUrl" [alt]="product.name" (error)="handleImageError($event)">
+      </div>
+
+      <div class="product-info">
+        <h3 class="product-name">{{ product.name }}</h3>
+        <p class="product-description">{{ product.description }}</p>
+        <p class="product-price">{{ product.price | currency }}</p>
+      </div>
+
+      <div class="product-actions">
+        <div class="cart-status" *ngIf="isInCart(product.id)">
+          In cart: {{ getQuantityInCart(product.id) }}
+        </div>
+
+        <button (click)="addToCart(product)" class="btn btn-primary add-to-cart-btn">
+          Add to Cart
+        </button>
+
+        <a [routerLink]="['/products', product.id]" class="btn btn-secondary details-btn">
+          View Details
+        </a>
+      </div>
+    </div>
+  </div>
+</div>

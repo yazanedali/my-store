@@ -1,0 +1,36 @@
+{
+  "products": [
+    {
+      "id": 1,
+      "name": "Smart Watch",
+      "price": 29.99,
+      "description": "Smart watch with various features including heart rate monitoring, GPS, and water resistance",
+      "imageUrl": "https://gourban.in/cdn/shop/files/Pulse.jpg?v=1749553994&width=2048",
+      "category": "electronics"
+    },
+    {
+      "id": 2, 
+      "name": "Smartphone",
+      "price": 39.99,
+      "description": "Latest model smartphone with advanced features, high-resolution camera, and long battery life",
+      "imageUrl": "https://static.independent.co.uk/2024/09/18/12/Apple-iphone-16-plus.jpg",
+      "category": "electronics"
+    },
+    {
+      "id": 3,
+      "name": "Wireless Headphones",
+      "price": 19.99,
+      "description": "High-quality wireless headphones with noise cancellation and comfortable design",
+      "imageUrl": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=500&h=500&fit=crop",
+      "category": "electronics"
+    },
+    {
+      "id": 4,
+      "name": "Laptop Backpack",
+      "price": 24.99,
+      "description": "Durable laptop backpack with multiple compartments and USB charging port",
+      "imageUrl": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=500&h=500&fit=crop",
+      "category": "accessories"
+    }
+  ]
+}
